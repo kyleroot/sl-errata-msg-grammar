@@ -1,0 +1,40 @@
+(* SYNOPSIS ---------------------------------------------------------------- *)
+(* TODO *)
+severity = ( 'Critical:' | 'Important:' | 'Moderate:' | 'Low:' )
+synopsis = 'Synopsis:' severity /.*$/
+
+(* ADVISORY ID ------------------------------------------------------------- *)
+(* TODO *)
+advisory-id = 'Advisory ID:' /.*$/
+
+(* ISSUE DATE -------------------------------------------------------------- *)
+year = /\d{4}/ ;
+month = /\d{2}/ ;
+day = /\d{2}/ ;
+issue-date = 'Issue Date:' year '-' month '-' day ;
+
+(* CVE NUMBERS ------------------------------------------------------------- *)
+(* support new format for CVE-ID *)
+(* https://cve.mitre.org/cve/identifiers/syntaxchange.html *)
+arbitrary-digits = /\d{4,}/ ;
+cve-number = 'CVE-' year '-' arbitrary-digits ;
+cve-numbers = 'CVE Numbers:' { cve-number }+ ;
+
+(* HEADER ------------------------------------------------------------------ *)
+header = synopsis advisory-id issue-date cve-numbers ;
+
+(* DESCRIPTION ------------------------------------------------------------- *)
+description = /[\w\W]+[^--]/ ;
+
+(* PACKAGE INFORMATION ----------------------------------------------------- *)
+package = /.*$/
+packages = { package }+ ;
+architecture = 'x86_64' | 'i386' | 'noarch' { packages } ;
+release = 'SL5' | 'SL6' | 'SL7' { architecture }+ ;
+package-info = { releases }+ ;
+
+(* SIGNATURE --------------------------------------------------------------- *)
+signature = '- Scientific Linux Development Team' $ ;
+
+(* SECURITY ERRATA MESSAGE ------------------------------------------------- *)
+security-errata-message = header '--\n' description '--\n' package-information signature ;
